@@ -1,0 +1,8 @@
+# DevicesToImport.csv
+# Structure: <SerialNumber>
+# -------------------------------------------------------------------------
+# lines beginning with '#' are comments and ignored
+SerialNumber
+G92720FA10E9
+G86320E39137
+G77D20D1A02C

@@ -1,0 +1,9 @@
+# DevicesToUpdate.csv
+# Structure: <SerialNumber>,<Name>,<EnableDeviceBeeping>,<EnableDriverIdentificationReminder>,<DriverIdentificationReminderImmobilizeSeconds>,<EnableBeepOnEngineRpm>,<EngineRpmBeepValue>,<EnableBeepOnIdle>,<IdleMinutesBeepValue>,<EnableBeepOnSpeeding>,<SpeedingStartBeepingSpeed>,<SpeedingStopBeepingSpeed>,<EnableBeepBrieflyWhenApprocahingWarningSpeed>,<EnableBeepOnDangerousDriving>,<AccelerationWarningThreshold>,<BrakingWarningThreshold>,<CorneringWarningThreshold>,<EnableBeepWhenSeatbeltNotUsed>,<SeatbeltNotUsedWarningSpeed>,<EnableBeepWhenPassengerSeatbeltNotUsed>,<BeepWhenReversing>
+# ---------------------------------------------------------------------------------
+# lines beginning with '#' are comments and ignored
+SerialNumber,Name,EnableDeviceBeeping,EnableDriverIdentificationReminder,DriverIdentificationReminderImmobilizeSeconds,EnableBeepOnEngineRpm,EngineRpmBeepValue,EnableBeepOnIdle,IdleMinutesBeepValue,EnableBeepOnSpeeding,SpeedingStartBeepingSpeed,SpeedingStopBeepingSpeed,EnableBeepBrieflyWhenApprocahingWarningSpeed,EnableBeepOnDangerousDriving,AccelerationWarningThreshold,BrakingWarningThreshold,CorneringWarningThreshold,EnableBeepWhenSeatbeltNotUsed,SeatbeltNotUsedWarningSpeed,EnableBeepWhenPassengerSeatbeltNotUsed,BeepWhenReversing
+G92720FA10E9,Vehicle1,true,true,60,true,4000,true,5,true,150,140,true,true,23,-35,27,true,15,true,true
+G86320E39137,Vehicle2,true,true,60,true,4000,true,5,true,150,140,true,true,23,-35,27,true,15,true,true
+G77D20D1A02C,Vehicle3,true,true,60,true,4000,true,5,true,150,140,true,true,23,-35,27,true,15,true,true
+G62920CB36F0,Vehicle4,true,true,60,true,4000,true,5,true,150,140,true,true,23,-35,27,true,15,true,true

@@ -1,0 +1,17 @@
+# Configuration file for Customer Onboarding Starter Kit utility: Processor_CreateDatabaseAndLoadDevices
+# Structure: <Key>,<Value>
+# -------------------------------------------------------------------------
+# lines beginning with '#' are comments and ignored
+Key,Value
+ResellerName,<ResellerName>
+ResellerErpAccountId,<ResellerErpAccountId>
+CustomerCompanyName,<CustomerCompanyName>
+CustomerAccountAdminFirstName,<CustomerAccountAdminFirstName>
+CustomerAccountAdminLastName,<CustomerAccountAdminLastName>
+CustomerAccountAdminEmail,<CustomerAccountAdminEmail>
+CustomerPhoneNumber,<CustomerPhoneNumber>
+CustomerFleetSize,<CustomerFleetSize>
+CustomerSignUpForNews,false
+CustomerDesiredDatabaseName,<CustomerDesiredDatabaseName>
+CustomerTimeZoneId,<CustomerTimeZoneId>
+CustomerDeviceListPath,<CustomerDeviceListPath>

@@ -1,0 +1,8 @@
+# Configuration file for Customer Onboarding Starter Kit utility: Processor_UpdateDevices
+# Structure: <Key>,<Value>
+# -------------------------------------------------------------------------
+# lines beginning with '#' are comments and ignored
+Key,Value
+ResellerErpAccountId,<ResellerErpAccountId>
+DatabaseName,<DatabaseName>
+DevicesToUpdateFilePath,<DevicesToUpdateFilePath>
