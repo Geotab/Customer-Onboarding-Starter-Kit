@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Geotab.CustomerOnboardngStarterKit.Utilities
 {
@@ -33,9 +32,9 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                     throw new ArgumentException("CSV dates cannot be smaller than 0.");
                 var dateOfReference = new DateTime(1900, 1, 1);
                 if (csvDate > 60d)
-                    csvDate = csvDate - 2;
+                    csvDate -= 2;
                 else
-                    csvDate = csvDate - 1;
+                    csvDate--;
                 return dateOfReference.AddDays(csvDate);
             });
             using (var sr = new StreamReader(stream))
@@ -50,11 +49,11 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                     var displayAttribute = (DisplayAttribute)prop.GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault();
                     return new
                     {
-                        Name = prop.Name,
+                        prop.Name,
                         DisplayName = displayAttribute?.Name ?? prop.Name,
                         Order = displayAttribute == null || !displayAttribute.GetOrder().HasValue ? 999 : displayAttribute.Order,
                         PropertyInfo = prop,
-                        PropertyType = prop.PropertyType,
+                        prop.PropertyType,
                         HasDisplayName = displayAttribute != null
                     };
                 })
@@ -106,67 +105,54 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                             object parsedValue = null;
                             if (propertyType == typeof(int?) || propertyType == typeof(int))
                             {
-                                int val;
-                                if (!int.TryParse(valueStr, out val))
+                                if (!int.TryParse(valueStr, out int val))
                                 {
-                                    val = default(int);
+                                    val = default;
                                 }
                                 parsedValue = val;
                             }
                             else if (propertyType == typeof(short?) || propertyType == typeof(short))
                             {
-                                short val;
-                                if (!short.TryParse(valueStr, out val))
-                                    val = default(short);
+                                if (!short.TryParse(valueStr, out short val))
+                                    val = default;
                                 parsedValue = val;
                             }
                             else if (propertyType == typeof(long?) || propertyType == typeof(long))
                             {
-                                long val;
-                                if (!long.TryParse(valueStr, out val))
-                                    val = default(long);
+                                if (!long.TryParse(valueStr, out long val))
+                                    val = default;
                                 parsedValue = val;
                             }
                             else if (propertyType == typeof(decimal?) || propertyType == typeof(decimal))
                             {
-                                decimal val;
-                                if (!decimal.TryParse(valueStr, out val))
-                                    val = default(decimal);
+                                if (!decimal.TryParse(valueStr, out decimal val))
+                                    val = default;
                                 parsedValue = val;
                             }
                             else if (propertyType == typeof(double?) || propertyType == typeof(double))
                             {
-                                double val;
-                                if (!double.TryParse(valueStr, out val))
-                                    val = default(double);
+                                if (!double.TryParse(valueStr, out double val))
+                                    val = default;
                                 parsedValue = val;
                             }
                             else if (propertyType == typeof(DateTime?) || propertyType == typeof(DateTime))
                             {
-                                if (value is DateTime)
+                                try
                                 {
-                                    parsedValue = value;
-                                }
-                                else
-                                {
-                                    try
+                                    if (DateTime.TryParse(value, out DateTime output))
                                     {
-                                        DateTime output;
-                                        if (DateTime.TryParse(value, out output))
-                                        {
-                                            parsedValue = output;
-                                        }
-                                        else
-                                        {
-                                            parsedValue = convertDateTime(Double.Parse(value));
-                                        }
+                                        parsedValue = output;
                                     }
-                                    catch
+                                    else
                                     {
-                                        if (propertyType == typeof(DateTime))
-                                        {
-                                            parsedValue = DateTime.MinValue;
-                                        }
+                                        parsedValue = convertDateTime(Double.Parse(value));
+                                    }
+                                }
+                                catch
+                                {
+                                    if (propertyType == typeof(DateTime))
+                                    {
+                                        parsedValue = DateTime.MinValue;
                                     }
                                 }
                             }
@@ -200,7 +186,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                             {
                                 prop.PropertyInfo.SetValue(item, parsedValue);
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 // Indicate parsing error on row?
                             }

@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Geotab.CustomerOnboardngStarterKit.Utilities;
 namespace Geotab.CustomerOnboardngStarterKit
 {
     class Program
     {
-        public static async Task Main() 
+        public static void Main()
         {
             try
             {
                 Console.Title = "Geotab Customer Onboarding Starter Kit";
                 ConsoleUtility.LogUtilityStartup("Customer Onboarding Starter Kit");
-                
+
                 ConsoleUtility.LogInfo("Available Utilities:");
                 ConsoleUtility.LogListItem("1", ": Create Database & Load Devices", ConsoleColor.Green);
                 ConsoleUtility.LogListItem("2", ": Update Devices", ConsoleColor.Green);
@@ -21,16 +20,15 @@ namespace Geotab.CustomerOnboardngStarterKit
                 {
                     utilitySelected = true;
                     string input = ConsoleUtility.GetUserInput("number of the utility to launch (from the above list)");
-                    int selection;
-                    if (int.TryParse(input, out selection))
+                    if (int.TryParse(input, out int selection))
                     {
                         switch (selection)
                         {
                             case 1:
-                                var processor_CreateDatabaseAndLoadDevices = await Processor_CreateDatabaseAndLoadDevices.CreateAsync();
+                                var processor_CreateDatabaseAndLoadDevices = Processor_CreateDatabaseAndLoadDevices.Create();
                                 break;
                             case 2:
-                                var processor_UpdateDevices = await Processor_UpdateDevices.CreateAsync();
+                                var processor_UpdateDevices = Processor_UpdateDevices.Create();
                                 break;
                             default:
                                 utilitySelected = false;
@@ -49,7 +47,7 @@ namespace Geotab.CustomerOnboardngStarterKit
             {
                 ConsoleUtility.LogError(e);
             }
-            finally 
+            finally
             {
                 Console.WriteLine("======================================================================");
                 Console.ForegroundColor = ConsoleColor.Yellow;

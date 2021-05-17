@@ -1,6 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using MyAdminApiLib.Geotab.MyAdmin.MyAdminApi;
 using MyAdminApiLib.Geotab.MyAdmin.MyAdminApi.ObjectModel;
 
 namespace Geotab.CustomerOnboardngStarterKit.Utilities
@@ -14,51 +15,68 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         const int ResultSetLimit_GetCurrentDeviceDatabases = 1000;
 
         /// <summary>
-        /// Requests user's MyAdmin credentials, authenticates and updates the myAdminApi object as well as the myAdminApiUser object which will contain the API key and Session ID required for subsequent API calls.
+        /// Requests user's MyAdmin credentials and authenticates. Returns:
+        /// <list type="bullet">
+        /// <item>
+        /// <term>myAdminApi</term>
+        /// <description>>The authenticated MyAdmin API (<see cref="MyAdminInvoker"/>) object.</description>
+        /// </item>
+        /// <item>
+        /// <term>myAdminApiUser</term>
+        /// <description>The <see cref="ApiUser"/> object containing the API key and Session ID required for subsequent API calls.</description>
+        /// </item>
+        /// <item>
+        /// <term>myAdminUsername</term>
+        /// <description>The user-entered username.</description>
+        /// </item>
+        /// <item>
+        /// <term>myAdminPassword</term>
+        /// <description>The user-entered password.</description>
+        /// </item>
+        /// </list>
         /// </summary>
-        /// <param name="myAdminApi">A reference to a MyAdmin API (<see cref="WebServerInvoker"/>) object.</param>
-        /// <param name="myAdminApiUser">A reference to a MyAdmin <see cref="ApiUser"/> object.</param>
-        /// <param name="myAdminUsername">A reference to a string variable which will be populated with the user-entered username.</param>
-        /// <param name="myAdminPassword">A reference to a string variable which will be populated with the user-entered password.</param>
-        public static void AuthenticateMyAdminApi(ref WebServerInvoker myAdminApi, ref ApiUser myAdminApiUser, ref string myAdminUsername, ref string myAdminPassword) 
+        /// <returns></returns>
+        public static async Task<(MyAdminInvoker myAdminApi, ApiUser myAdminApiUser, string myAdminUsername, string myAdminPassword)> AuthenticateMyAdminApi()
         {
-            myAdminUsername = ConsoleUtility.GetUserInput("MyAdmin Username");
-            myAdminPassword = ConsoleUtility.GetUserInputMasked("MyAdmin Password");
-            myAdminApi = new WebServerInvoker(null, 60000) { Url = "https://myadminapi.geotab.com/v2/MyAdminApi.ashx" };
-            Dictionary<string, object> parameters = new Dictionary<string, object>
+            var myAdminUsername = ConsoleUtility.GetUserInput("MyAdmin Username");
+            var myAdminPassword = ConsoleUtility.GetUserInputMasked("MyAdmin Password");
+            var myAdminApi = new MyAdminInvoker("https://myadminapi.geotab.com/v2/MyAdminApi.ashx", 60000);
+            Dictionary<string, object> parameters = new()
             {
-                {"username", myAdminUsername},
-                {"password", myAdminPassword}
+                { "username", myAdminUsername },
+                { "password", myAdminPassword }
             };
             ConsoleUtility.LogInfoStart($"Authenticating MyAdmin API (User: '{myAdminUsername}')...");
-            myAdminApiUser = myAdminApi.Invoke("Authenticate", typeof(ApiUser), parameters) as ApiUser;
+            var myAdminApiUser = await myAdminApi.InvokeAsync<ApiUser>("Authenticate", parameters);
             ConsoleUtility.LogComplete();
-        }  
+
+            return (myAdminApi, myAdminApiUser, myAdminUsername, myAdminPassword);
+        }
 
         /// <summary>
         /// Retrieves the full list of MyGeotab databases (<see cref="ApiDeviceDatabaseExtended"/> objects) associated with the specified ERP account Id. 
         /// </summary>
-        /// <param name="myAdminApi">A reference to a MyAdmin API (<see cref="WebServerInvoker"/>) object.</param>
+        /// <param name="myAdminApi">A reference to a MyAdmin API (<see cref="MyAdminInvoker"/>) object.</param>
         /// <param name="myAdminApiUser">A reference to an authenticated MyAdmin <see cref="ApiUser"/> object.</param>
         /// <param name="forAccount">The ERP account Id for which to retrieve the list of associated databases.</param>
-        public static IList<ApiDeviceDatabaseExtended> GetCurrentDeviceDatabases(ref WebServerInvoker myAdminApi,  ref ApiUser myAdminApiUser,  string forAccount)
+        public static async Task<IList<ApiDeviceDatabaseExtended>> GetCurrentDeviceDatabases(MyAdminInvoker myAdminApi,  ApiUser myAdminApiUser,  string forAccount)
         {
             // Create a new list to store all results from one or more batches (since each result set is limited to 1000 records).  Repeat GetCurrentDeviceDatabases() calls until all records have been received and then return the full list.
-            List<ApiDeviceDatabaseExtended> allCurrentDeviceDatabases = new List<ApiDeviceDatabaseExtended>();
+            List<ApiDeviceDatabaseExtended> allCurrentDeviceDatabases = new();
 
             bool allRecordsReceived = false;
             int nextId = 0;
 
             while (!allRecordsReceived)
             {
-                Dictionary<string, object> parameters = new Dictionary<string, object>
+                Dictionary<string, object> parameters = new()
                 {
                     {"apiKey", myAdminApiUser.UserId},
                     {"sessionId", myAdminApiUser.SessionId},
                     {"forAccount", forAccount},
                     {"nextId", nextId}
                 };
-                IList<ApiDeviceDatabaseExtended> currentDeviceDatabasesBatch = myAdminApi.Invoke("GetCurrentDeviceDatabases", typeof(ApiDeviceDatabaseExtended[]),parameters) as IList<ApiDeviceDatabaseExtended>;
+                var currentDeviceDatabasesBatch = await myAdminApi.InvokeAsync<IList<ApiDeviceDatabaseExtended>>("GetCurrentDeviceDatabases", parameters);
 
                 if (currentDeviceDatabasesBatch.Any())
                 {

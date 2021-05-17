@@ -26,7 +26,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                                     RegexOptions.None, TimeSpan.FromMilliseconds(200));
 
                 // Examines the domain part of the email and normalizes it.
-                string DomainMapper(Match match)
+                static string DomainMapper(Match match)
                 {
                     // Use IdnMapping class to convert Unicode domain names.
                     var idn = new IdnMapping();
@@ -37,11 +37,11 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                     return match.Groups[1].Value + domainName;
                 }
             }
-            catch (RegexMatchTimeoutException e)
+            catch (RegexMatchTimeoutException)
             {
                 return false;
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 return false;
             }
@@ -141,8 +141,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         /// <returns>The validated password.</returns>
         public static string ValidatePassword(string password)
         {
-            string errorMessage;
-            if (IsValidPassword(password, out errorMessage))
+            if (IsValidPassword(password, out string errorMessage))
             {
                 return password;
             }
@@ -166,7 +165,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         /// <returns>The string representation of the valid boolean</returns>
         public static string ValidateStringIsBoolean(string inputString, string entityTypeRepresented)
         {
-            if (bool.TryParse(inputString, out bool value))
+            if (bool.TryParse(inputString, out _))
             {
                 return inputString;
             }
@@ -176,7 +175,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
             {
                 ConsoleUtility.LogInfo($"The value '{inputString}' entered for '{entityTypeRepresented}' is not valid.");
                 inputString = ConsoleUtility.GetUserInput($"a boolean (true or false) value for {entityTypeRepresented}");
-                tryAgain = !bool.TryParse(inputString, out bool value2);
+                tryAgain = !bool.TryParse(inputString, out _);
             }
             return inputString;
         }
@@ -189,7 +188,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         /// <returns>The string representation of the valid integer.</returns>
         public static string ValidateStringIsInt32(string inputString, string entityTypeRepresented)
         {
-            if (Int32.TryParse(inputString, out int value))
+            if (Int32.TryParse(inputString, out _))
             {
                 return inputString;
             }
@@ -199,7 +198,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
             {
                 ConsoleUtility.LogInfo($"The value '{inputString}' entered for '{entityTypeRepresented}' is not valid.");
                 inputString = ConsoleUtility.GetUserInput($"an integer value for {entityTypeRepresented}");
-                tryAgain = !Int32.TryParse(inputString, out int value2);
+                tryAgain = !Int32.TryParse(inputString, out _);
             }
             return inputString;
         }

@@ -31,7 +31,6 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         public static string GetUserInputFilePath(string fileTypeDescription) 
         {
             string filePath = string.Empty;
-            string fileName = string.Empty;
             string fileFullPath = string.Empty;
             bool filePathIsValid = false;
             bool fileNameIsValid = false;
@@ -60,7 +59,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write($"> Enter {fileTypeDescription} file name (e.g. 'FileName.csv'):");
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                fileName = Console.ReadLine();
+                string fileName = Console.ReadLine();
                 Console.ForegroundColor = ConsoleColor.White;
                 fileFullPath = Path.Combine(filePath, fileName);
                 if (File.Exists(fileFullPath))

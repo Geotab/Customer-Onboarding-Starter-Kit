@@ -1,19 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <Company>Geotab Inc.</Company>
+    <Product>Geotab Customer Onboarding Starter Kit</Product>
+    <Authors>Geotab Inc.</Authors>
+    <Version>1.0.2101.1</Version>
+    <Description>A configurable .NET 5.0 console application intended as a solution/example for resellers to use in simplifying the customer onboarding process. It creates a new database, adds an administrative user and loads a list of devices from a CSV file.</Description>    
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="MyAdminApiLib" Version="1.0.0">
-      <HintPath>..\lib\MyAdminApiLib.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Geotab.Checkmate.ObjectModel" Version="5.7.1902" />
+    <PackageReference Include="Geotab.Checkmate.ObjectModel" Version="5.7.2101" />
+    <PackageReference Include="Geotab.Internal.MyAdmin.APILib" Version="1.1.3" />
   </ItemGroup>
 
 </Project>

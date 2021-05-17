@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Geotab.Checkmate.ObjectModel;
 
 namespace Geotab.CustomerOnboardngStarterKit

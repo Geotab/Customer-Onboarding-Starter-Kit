@@ -72,7 +72,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         {
             string userName = ConsoleUtility.GetUserInput($"MyGeotab username for '{database}' database");
             string password = ConsoleUtility.GetUserInputMasked($"MyGeotab password for '{database}' database");
-            API myGeotabApi = new API(userName, password, null, database, server);
+            API myGeotabApi = new(userName, password, null, database, server);
             ConsoleUtility.LogInfoStart($"Authenticating MyGeotab API (User: '{myGeotabApi.UserName}', Database: '{myGeotabApi.Database}', Server: '{myGeotabApi.Server}')...");
             await myGeotabApi.AuthenticateAsync();
             ConsoleUtility.LogComplete();
@@ -89,7 +89,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         /// <returns>>An authenticated MyGeotab <see cref="API"/> object.</returns>
         public static async Task<API> AuthenticateMyGeotabApiAsync(string server, string database, string userName, string password) 
         {
-            API myGeotabApi = new API(userName, password, null, database, server);
+            API myGeotabApi = new(userName, password, null, database, server);
             ConsoleUtility.LogInfoStart($"Authenticating MyGeotab API (User: '{myGeotabApi.UserName}', Database: '{myGeotabApi.Database}', Server: '{myGeotabApi.Server}')...");
             await  myGeotabApi.AuthenticateAsync();
             ConsoleUtility.LogComplete();
@@ -123,19 +123,19 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
 
             string result = await myGeotabApi.CallAsync<string>("CreateDatabase", new 
             {
-                database = database,
-                userName = userName,
-                password = password,
+                database,
+                userName,
+                password,
                 companyDetails = new {
-                    companyName = companyName,
-                    firstName = firstName,
-                    lastName = lastName,
-                    phoneNumber = phoneNumber,
-                    resellerName = resellerName,
-                    fleetSize = fleetSize,
+                    companyName,
+                    firstName,
+                    lastName,
+                    phoneNumber,
+                    resellerName,
+                    fleetSize,
                     comments = "",
-                    signUpForNews = signUpForNews,
-                    timeZoneId = timeZoneId
+                    signUpForNews,
+                    timeZoneId
                 }
             });
 
@@ -244,19 +244,12 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         /// <returns>The retrieved list of groups or an empty list of <see cref="Group"/> if not found.</returns>
         static async Task<IList<Group>> GetGroupsAsync(API myGeotabApi, GroupType groupType)
         {
-            IList<Group> groups = null;
-            switch (groupType)
+            IList<Group> groups = groupType switch
             {
-                case GroupType.Security:
-                    groups = await myGeotabApi.CallAsync<IList<Group>>("Get", typeof(Group), new { search = new GroupSearch(new SecurityGroup().Id) }) ?? new List<Group>();
-                    break;
-                case GroupType.Company:
-                    groups = await myGeotabApi.CallAsync<IList<Group>>("Get", typeof(Group)) ?? new List<Group>();
-                    break;
-                default:
-                    groups = new List<Group>();
-                    break;
-            }
+                GroupType.Security => await myGeotabApi.CallAsync<IList<Group>>("Get", typeof(Group), new { search = new GroupSearch(new SecurityGroup().Id) }) ?? new List<Group>(),
+                GroupType.Company => await myGeotabApi.CallAsync<IList<Group>>("Get", typeof(Group)) ?? new List<Group>(),
+                _ => new List<Group>(),
+            };
             return groups;
         }
 
@@ -269,25 +262,14 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         public static IList<Group> GetSecurityGroupAsList(SecurityGroupName securityGroupName, IList<Group> securityGroups)
         {
             IList<Group> groups = new List<Group>();
-            string securityGroupFullName;
-            switch (securityGroupName)
+            string securityGroupFullName = securityGroupName switch
             {
-                case SecurityGroupName.Administrator:
-                    securityGroupFullName = "**EverythingSecurity**";
-                    break;
-                case SecurityGroupName.Supervisor:
-                    securityGroupFullName = "**SupervisorSecurity**";
-                    break;
-                case SecurityGroupName.ViewOnly:
-                    securityGroupFullName = "**ViewOnlySecurity**";
-                    break;
-                case SecurityGroupName.Nothing:
-                    securityGroupFullName = "**NothingSecurity**";
-                    break;
-                default:
-                    securityGroupFullName = "**NothingSecurity**";
-                    break;
-            }
+                SecurityGroupName.Administrator => "**EverythingSecurity**",
+                SecurityGroupName.Supervisor => "**SupervisorSecurity**",
+                SecurityGroupName.ViewOnly => "**ViewOnlySecurity**",
+                SecurityGroupName.Nothing => "**NothingSecurity**",
+                _ => "**NothingSecurity**",
+            };
             for (int i = 0; i < securityGroups.Count; i++)
             {
                 Group group = securityGroups[i];

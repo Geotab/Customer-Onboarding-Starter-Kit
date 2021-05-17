@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyAdminApiLib.Geotab.MyAdmin.MyAdminApi;
 using MyAdminApiLib.Geotab.MyAdmin.MyAdminApi.ObjectModel;
 using Geotab.Checkmate;
 using Geotab.Checkmate.ObjectModel;
@@ -18,8 +19,8 @@ namespace Geotab.CustomerOnboardngStarterKit
     {
         const string UtilityName = "Update Devices Utility";  
         const string GeotabServer = "my.geotab.com";
-        IList<ConfigItem> configItems; 
-        WebServerInvoker myAdminApi;
+        IList<ConfigItem> configItems;
+        MyAdminInvoker myAdminApi;
         ApiUser myAdminApiUser;
         string myAdminApiUsername;
         string myAdminApiPassword; 
@@ -41,10 +42,10 @@ namespace Geotab.CustomerOnboardngStarterKit
         /// Creates a <see cref="Processor_UpdateDevices"/> instance and calls its <c>Execute()</c> method.
         /// </summary>
         /// <returns>The <see cref="Processor_UpdateDevices"/> instance once execution has completed.</returns>
-        public static async Task<Processor_UpdateDevices> CreateAsync()
+        public static Processor_UpdateDevices Create()
         {
             var processor_UpdateDevices = new Processor_UpdateDevices();
-            Task.Run(async() => { await processor_UpdateDevices.Execute(); }).Wait();
+            Task.Run(async () => { await processor_UpdateDevices.Execute(); }).Wait();
             return processor_UpdateDevices;
         }
 
@@ -84,13 +85,13 @@ namespace Geotab.CustomerOnboardngStarterKit
             // Authenticate MyAdmin API.
             try
             {
-                AdminSdkUtility.AuthenticateMyAdminApi(ref myAdminApi, ref myAdminApiUser, ref myAdminApiUsername, ref myAdminApiPassword);
+                (myAdminApi, myAdminApiUser, myAdminApiUsername, myAdminApiPassword) = await AdminSdkUtility.AuthenticateMyAdminApi();
             }
             catch (Exception e)
             {
                 ConsoleUtility.LogError(e);
                 // Provide user with a second authentication attempt.
-                AdminSdkUtility.AuthenticateMyAdminApi(ref myAdminApi, ref myAdminApiUser, ref myAdminApiUsername, ref myAdminApiPassword);
+                (myAdminApi, myAdminApiUser, myAdminApiUsername, myAdminApiPassword) = await AdminSdkUtility.AuthenticateMyAdminApi();
             } 
             
             // Authenticate MyGeotab API.
@@ -113,11 +114,11 @@ namespace Geotab.CustomerOnboardngStarterKit
             // Get existing devices.
             ConsoleUtility.LogInfoStart($"Retrieving device and device database lists...");
             IList<Device> existingDevices = await myGeotabApi.CallAsync<IList<Device>>("Get", typeof(Device)) ?? new List<Device>();
-            IList<ApiDeviceDatabaseExtended> currentDeviceDatabases = AdminSdkUtility.GetCurrentDeviceDatabases(ref myAdminApi, ref myAdminApiUser, resellerErpAccountId);
+            var currentDeviceDatabases = await AdminSdkUtility.GetCurrentDeviceDatabases(myAdminApi, myAdminApiUser, resellerErpAccountId);
             ConsoleUtility.LogComplete();          
 
             // Process device list, adding new devices to the database and updating existing devices.
-            ConsoleUtility.LogInfo($"Processing {deviceCandidates.Count()} device(s) - attempting to update devices in MyGeotab database '{databaseName}'.");             
+            ConsoleUtility.LogInfo($"Processing {deviceCandidates.Count} device(s) - attempting to update devices in MyGeotab database '{databaseName}'.");             
             foreach (DeviceDetails deviceCandidate in deviceCandidates)
             {
                 // Update device if it already exists in the current database.
@@ -146,13 +147,13 @@ namespace Geotab.CustomerOnboardngStarterKit
                 }
                 
                 string deviceCandidateSerialNumber = deviceCandidate.SerialNumber.Replace("-", "");
-
+               
                 // Check if the device is already in any database.
                 if (currentDeviceDatabases.Where(database => database.SerialNumber == deviceCandidateSerialNumber).Any())
                 {
                     IList<ApiDeviceDatabaseExtended> exitstingDatabases = currentDeviceDatabases.Where(database => database.SerialNumber == deviceCandidateSerialNumber).ToList();
 
-                    StringBuilder existingDatabaseNames = new StringBuilder();
+                    StringBuilder existingDatabaseNames = new();
                     foreach (ApiDeviceDatabaseExtended database in exitstingDatabases)
                     {
                         if (existingDatabaseNames.Length > 0)
@@ -164,7 +165,7 @@ namespace Geotab.CustomerOnboardngStarterKit
                            existingDatabaseNames.Append($"'{database.DatabaseName}'"); 
                         }
                     }
-                    ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT UPDATED OR ADDED: Device does not exist in '{databaseName}' database, but already exists in MyGeotab database(s) {existingDatabaseNames.ToString()}.", ConsoleColor.Red);
+                    ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT UPDATED OR ADDED: Device does not exist in '{databaseName}' database, but already exists in MyGeotab database(s) {existingDatabaseNames}.", ConsoleColor.Red);
                     continue;                    
                 }
 
