@@ -25,7 +25,7 @@ The sample application requires:
 **IMPORTANT:**  See the [Customer Onboarding Starter Kit User Guide](https://docs.google.com/document/d/16Z9gHSgOjNJtSBVLngNPXQlgW2ikPWjXZRLkl8HAqHY) before attempting to run this application; the user guide contains important information about necessary configuration.
 
 ```shell
-> git clone https://git.geotab.com/engsupport/integration/standalone-apps/customer-onboarding-starter-kit.git customer-onboarding-starter-kit
+> git clone https://github.com/Geotab/Customer-Onboarding-Starter-Kit.git customer-onboarding-starter-kit
 > cd customer-onboarding-starter-kit
 > dotnet run
 ```
