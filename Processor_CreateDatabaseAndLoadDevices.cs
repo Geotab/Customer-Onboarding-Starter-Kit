@@ -244,7 +244,7 @@ namespace Geotab.CustomerOnboardngStarterKit
                            existingDatabaseNames.Append($"'{database.OwnerDatabaseName}'"); 
                         }
                     }
-                    ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT ADDED: Device already exists in MyGeotab database(s) {existingDatabaseNames}.", ConsoleColor.Red);
+                    ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT ADDED: Device already exists in another MyGeotab database(s).", ConsoleColor.Red);
                     continue;                    
                 }
 

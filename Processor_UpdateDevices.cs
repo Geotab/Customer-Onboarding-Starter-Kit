@@ -166,7 +166,7 @@ namespace Geotab.CustomerOnboardngStarterKit
                            existingDatabaseNames.Append($"'{database.OwnerDatabaseName}'"); 
                         }
                     }
-                    ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT UPDATED OR ADDED: Device does not exist in '{databaseName}' database, but already exists in MyGeotab database(s) {existingDatabaseNames}.", ConsoleColor.Red);
+                    ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT UPDATED OR ADDED: Device does not exist in '{databaseName}' database, but already exists in another MyGeotab database(s).", ConsoleColor.Red);
                     continue;                    
                 }
 
