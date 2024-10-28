@@ -1,6 +1,6 @@
 # Customer Onboarding Starter Kit
 
-The *Customer Onboarding Starter Kit* is a sample application intended to assist Geotab Platform Partners - resellers primarily using  the API-only option, which precludes the use of the MyGeotab interface - in onboarding new customers by automating certain tasks using MyGeotab SDK-based workflows.  It may be run as-is if it satisfies all requirements, or it can be modified as needed.  Taking the form of a .NET 5.0 console application using the MyGeotab .NET SDK, the code is focused on API calls and associated logic rather than being overwhelmed with application, framework or user interface specific code.
+The *Customer Onboarding Starter Kit* is a sample application intended to assist Geotab Platform Partners - resellers primarily using  the API-only option, which precludes the use of the MyGeotab interface - in onboarding new customers by automating certain tasks using MyGeotab SDK-based workflows.  It may be run as-is if it satisfies all requirements, or it can be modified as needed.  Taking the form of a .NET 8.0 console application using the MyGeotab .NET SDK, the code is focused on API calls and associated logic rather than being overwhelmed with application, framework or user interface specific code.
 
 Two utilities, outlined as follows, are included in the Customer Onboarding Starter Kit:
 
@@ -17,7 +17,7 @@ Two utilities, outlined as follows, are included in the Customer Onboarding Star
 
 The sample application requires:
 
-- [.NET 5.0 SDK](https://dotnet.microsoft.com/download) or higher
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or higher
 - MyAdmin credentials (entered manually when prompted) with the *MyAdminApiUser* and *Device_Admin* roles.
 
 ## Getting started

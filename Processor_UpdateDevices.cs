@@ -45,7 +45,7 @@ namespace Geotab.CustomerOnboardngStarterKit
         public static Processor_UpdateDevices Create()
         {
             var processor_UpdateDevices = new Processor_UpdateDevices();
-            Task.Run(async () => { await processor_UpdateDevices.Execute(); }).Wait();
+			Task.Run(async () => { await processor_UpdateDevices.Execute(); }).Wait();
             return processor_UpdateDevices;
         }
 
@@ -114,7 +114,8 @@ namespace Geotab.CustomerOnboardngStarterKit
             // Get existing devices.
             ConsoleUtility.LogInfoStart($"Retrieving device and device database lists...");
             IList<Device> existingDevices = await myGeotabApi.CallAsync<IList<Device>>("Get", typeof(Device)) ?? new List<Device>();
-            var currentDeviceDatabases = await AdminSdkUtility.GetCurrentDeviceDatabases(myAdminApi, myAdminApiUser, resellerErpAccountId);
+			IList<string> deviceSerialNumbers = deviceCandidates.Select(x => x.SerialNumber).ToList();
+			var currentDeviceDatabaseNames = await AdminSdkUtility.GetDeviceDatabaseNamesAsync(myAdminApi, myAdminApiUser, deviceSerialNumbers);
             ConsoleUtility.LogComplete();          
 
             // Process device list, adding new devices to the database and updating existing devices.
@@ -149,31 +150,31 @@ namespace Geotab.CustomerOnboardngStarterKit
                 string deviceCandidateSerialNumber = deviceCandidate.SerialNumber.Replace("-", "");
                
                 // Check if the device is already in any database.
-                if (currentDeviceDatabases.Where(database => database.SerialNumber == deviceCandidateSerialNumber).Any())
+                if (currentDeviceDatabaseNames.Where(database => database.SerialNo == deviceCandidateSerialNumber).Any())
                 {
-                    IList<ApiDeviceDatabaseExtended> exitstingDatabases = currentDeviceDatabases.Where(database => database.SerialNumber == deviceCandidateSerialNumber).ToList();
+                    IList<ApiDeviceDatabaseOwnerShared> existingDatabases = currentDeviceDatabaseNames.Where(database => database.SerialNo == deviceCandidateSerialNumber).ToList();
 
                     StringBuilder existingDatabaseNames = new();
-                    foreach (ApiDeviceDatabaseExtended database in exitstingDatabases)
+                    foreach (ApiDeviceDatabaseOwnerShared database in existingDatabases)
                     {
                         if (existingDatabaseNames.Length > 0)
                         {
-                            existingDatabaseNames.Append($", '{database.DatabaseName}'");
+                            existingDatabaseNames.Append($", '{database.OwnerDatabaseName}'");
                         }
                         else
                         {
-                           existingDatabaseNames.Append($"'{database.DatabaseName}'"); 
+                           existingDatabaseNames.Append($"'{database.OwnerDatabaseName}'"); 
                         }
                     }
                     ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT UPDATED OR ADDED: Device does not exist in '{databaseName}' database, but already exists in MyGeotab database(s) {existingDatabaseNames}.", ConsoleColor.Red);
                     continue;                    
                 }
 
-                // Assign the device to the Company group.
-                deviceGroups.Add(new CompanyGroup());
+				// Assign the device to the GroupVehicleId group to make it a Vehicle asset type.
+				deviceGroups.Add(new Group(Id.Create(GeotabSdkUtility.GroupAssetTypeVehicleId)));
 
-                // Add the device to the MyGeotab database.
-                try
+				// Add the device to the MyGeotab database.
+				try
                 {
                     // Create the device object.
                     Device newDevice = Device.FromSerialNumber(deviceCandidate.SerialNumber);

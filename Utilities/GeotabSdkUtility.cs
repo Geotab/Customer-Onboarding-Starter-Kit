@@ -13,14 +13,15 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
     /// </summary>
     public static class GeotabSdkUtility
     {
-        public const string CompanyGroupName = "**Org**";
+        public const string CompanyGroupName = "Company Group";
+		public const string GroupAssetTypeVehicleId = "GroupVehicleId";
 
-        #region " Enums "
+		#region " Enums "
 
-        /// <summary>
-        /// MyGeotab group types.
-        /// </summary>
-        enum GroupType
+		/// <summary>
+		/// MyGeotab group types.
+		/// </summary>
+		enum GroupType
         {
             Company, Security
         }
@@ -46,7 +47,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         }
 
         /// <summary>
-        /// Adds a <see cref="Device"/> to the database associated with the credemtials of the authenticated myGeotabApi (<see cref="API"/>) object and returns the new device.
+        /// Adds a <see cref="Device"/> to the database associated with the credentials of the authenticated myGeotabApi (<see cref="API"/>) object and returns the new device.
         /// </summary>
         /// <param name="myGeotabApi">An authenticated MyGeotab <see cref="API"/> object.</param>
         /// <param name="device">The <see cref="Device"/> to be added.</param>
@@ -358,26 +359,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                 goDevice.SpeedingOff = speedingStopBeepingSpeed;
                 goDevice.EnableSpeedWarning = enableBeepBrieflyWhenApprocahingWarningSpeed;
                 // Update properties by specific GO device type.
-                if (goDevice is Go4v3)
-                {
-                    Go4v3 go4v3 = goDevice as Go4v3;
-                    go4v3.ImmobilizeUnit = enableDriverIdentificationReminder;
-                    go4v3.ImmobilizeArming = driverIdentificationReminderImmobilizeSeconds;
-                    go4v3.EnableBeepOnRpm = enableBeepOnEngineRpm;
-                    go4v3.RpmValue = engineRpmBeepValue;
-                    go4v3.EnableBeepOnDangerousDriving = enableBeepOnDangerousDriving;
-                    go4v3.AccelerationWarningThreshold = accelerationWarningThreshold;
-                    go4v3.AccelerometerThresholdWarningFactor = 0;
-                    go4v3.BrakingWarningThreshold = brakingWarningThreshold;
-                    go4v3.CorneringWarningThreshold = corneringWarningThreshold;
-                    go4v3.IsDriverSeatbeltWarningOn = enableBeepWhenSeatbeltNotUsed;
-                    go4v3.SeatbeltWarningSpeed = seatbeltNotUsedWarningSpeed;
-                    go4v3.IsPassengerSeatbeltWarningOn = enableBeepWhenPassengerSeatbeltNotUsed;
-                    go4v3.IsReverseDetectOn = beepWhenReversing;
-
-                    await myGeotabApi.CallAsync<object>("Set", typeof(Device), new { entity = go4v3 });
-                }                
-                else if (goDevice is Go5)
+                if (goDevice is Go5)
                 {
                     Go5 go5 = goDevice as Go5;
                     go5.EnableBeepOnRpm = enableBeepOnEngineRpm;

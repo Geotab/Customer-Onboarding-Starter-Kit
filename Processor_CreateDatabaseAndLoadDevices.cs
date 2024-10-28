@@ -125,8 +125,8 @@ namespace Geotab.CustomerOnboardngStarterKit
                 ConsoleUtility.LogError(e);
                 // Provide user with a second authentication attempt.
                 (myAdminApi, myAdminApiUser, myAdminApiUsername, myAdminApiPassword) = await AdminSdkUtility.AuthenticateMyAdminApi();
-            } 
-            
+            }
+
             // Authenticate MyGeotab API.
             myGeotabApi = await GeotabSdkUtility.AuthenticateMyGeotabApiAsync(GeotabServer, "", myAdminApiUsername, myAdminApiPassword);
 
@@ -166,8 +166,8 @@ namespace Geotab.CustomerOnboardngStarterKit
             string customerDatabaseServer = serverAndDatabase.First();
             string customerDatabase = serverAndDatabase.Last();
 
-            // Authenticate MyGeotab API against the newly-created database:
-            myGeotabApi = await GeotabSdkUtility.AuthenticateMyGeotabApiAsync(customerDatabaseServer, customerDatabase, myAdminApiUsername, myAdminApiPassword);
+			// Authenticate MyGeotab API against the newly-created database:
+			myGeotabApi = await GeotabSdkUtility.AuthenticateMyGeotabApiAsync(customerDatabaseServer, customerDatabase, myAdminApiUsername, myAdminApiPassword);
 
             // Create administrative user in customer database for customer administrator to use.
             IList<User> existingUsers = new List<User>();
@@ -176,7 +176,7 @@ namespace Geotab.CustomerOnboardngStarterKit
             IList<Group> adminSecurityGroup = GeotabSdkUtility.GetSecurityGroupAsList(GeotabSdkUtility.SecurityGroupName.Administrator, securityGroups);
             IList<Group> companyGroup = GeotabSdkUtility.GetGroupAsList(GeotabSdkUtility.CompanyGroupName, companyGroups);
 
-            User user = User.CreateBasicUser(null, null, customerAccountAdminEmail, customerAccountAdminFirstName, customerAccountAdminLastName, customerAccountAdminPassword, null, null, null, DateTime.MinValue, DateTime.MaxValue, companyGroup, null, adminSecurityGroup, null);
+			User user = User.CreateBasicUser(null, null, customerAccountAdminEmail, customerAccountAdminFirstName, customerAccountAdminLastName, customerAccountAdminPassword, null, null, null, DateTime.MinValue, DateTime.MaxValue, companyGroup, null, adminSecurityGroup, null);
             user.ChangePassword = true;
             if (GeotabSdkUtility.ValidateUser(user, existingUsers))
             {
@@ -211,10 +211,10 @@ namespace Geotab.CustomerOnboardngStarterKit
                 return;
             }
 
-            // Get existing devices.
+            // Get associated databases for devices, if already existing in a database.
             ConsoleUtility.LogInfoStart($"Retrieving device and device database lists...");
-            IList<Device> existingDevices = await myGeotabApi.CallAsync<IList<Device>>("Get", typeof(Device));
-            var currentDeviceDatabases = await AdminSdkUtility.GetCurrentDeviceDatabases(myAdminApi, myAdminApiUser, resellerErpAccountId);
+			IList<string> deviceSerialNumbers = deviceCandidates.Select(x => x.SerialNumber).ToList();
+			var currentDeviceDatabaseNames = await AdminSdkUtility.GetDeviceDatabaseNamesAsync(myAdminApi, myAdminApiUser, deviceSerialNumbers);
             ConsoleUtility.LogComplete();
 
             // Add devices into the MyGeotab database.
@@ -228,28 +228,28 @@ namespace Geotab.CustomerOnboardngStarterKit
                 string deviceCandidateSerialNumber = deviceCandidate.SerialNumber.Replace("-", "");
 
                 // Check if the device is already in any database.
-                if (currentDeviceDatabases.Where(database => database.SerialNumber == deviceCandidateSerialNumber).Any())
+                if (currentDeviceDatabaseNames.Where(database => database.SerialNo == deviceCandidateSerialNumber).Any())
                 {
-                    IList<ApiDeviceDatabaseExtended> existingDatabases = currentDeviceDatabases.Where(database => database.SerialNumber == deviceCandidateSerialNumber).ToList();
+                    IList<ApiDeviceDatabaseOwnerShared> existingDatabases = currentDeviceDatabaseNames.Where(database => database.SerialNo == deviceCandidateSerialNumber).ToList();
 
                     StringBuilder existingDatabaseNames = new();
-                    foreach (ApiDeviceDatabaseExtended database in existingDatabases)
+                    foreach (ApiDeviceDatabaseOwnerShared database in existingDatabases)
                     {
                         if (existingDatabaseNames.Length > 0)
                         {
-                            existingDatabaseNames.Append($", '{database.DatabaseName}'");
+							existingDatabaseNames.Append($", '{database.OwnerDatabaseName}'");
                         }
                         else
                         {
-                           existingDatabaseNames.Append($"'{database.DatabaseName}'"); 
+                           existingDatabaseNames.Append($"'{database.OwnerDatabaseName}'"); 
                         }
                     }
                     ConsoleUtility.LogListItemWithResult($"{deviceCandidate.Name}", $"NOT ADDED: Device already exists in MyGeotab database(s) {existingDatabaseNames}.", ConsoleColor.Red);
                     continue;                    
                 }
 
-                // Assign the device to the Company group.
-                deviceGroups.Add(new CompanyGroup());
+                // Assign the device to the GroupVehicleId group to make it a Vehicle asset type.
+                deviceGroups.Add(new Group(Id.Create(GeotabSdkUtility.GroupAssetTypeVehicleId)));
 
                 // Add the device to the MyGeotab database.
                 try

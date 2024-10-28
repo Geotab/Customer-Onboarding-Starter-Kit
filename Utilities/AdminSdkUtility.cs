@@ -38,16 +38,16 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
         /// <returns></returns>
         public static async Task<(MyAdminInvoker myAdminApi, ApiUser myAdminApiUser, string myAdminUsername, string myAdminPassword)> AuthenticateMyAdminApi()
         {
-            var myAdminUsername = ConsoleUtility.GetUserInput("MyAdmin Username");
-            var myAdminPassword = ConsoleUtility.GetUserInputMasked("MyAdmin Password");
+			var myAdminUsername = ConsoleUtility.GetUserInput("MyAdmin Username");
+			var myAdminPassword = ConsoleUtility.GetUserInputMasked("MyAdmin Password");
             var myAdminApi = new MyAdminInvoker("https://myadminapi.geotab.com/v2/MyAdminApi.ashx", 60000);
             Dictionary<string, object> parameters = new()
-            {
-                { "username", myAdminUsername },
-                { "password", myAdminPassword }
-            };
-            ConsoleUtility.LogInfoStart($"Authenticating MyAdmin API (User: '{myAdminUsername}')...");
-            var myAdminApiUser = await myAdminApi.InvokeAsync<ApiUser>("Authenticate", parameters);
+			{
+				{ "username", myAdminUsername },
+				{ "password", myAdminPassword }
+			};
+			ConsoleUtility.LogInfoStart($"Authenticating MyAdmin API (User: '{myAdminUsername}')...");
+			var myAdminApiUser = await myAdminApi.InvokeAsync<ApiUser>("Authenticate", parameters);
             ConsoleUtility.LogComplete();
 
             return (myAdminApi, myAdminApiUser, myAdminUsername, myAdminPassword);
@@ -65,7 +65,7 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
             List<ApiDeviceDatabaseExtended> allCurrentDeviceDatabases = new();
 
             bool allRecordsReceived = false;
-            int nextId = 0;
+            double nextId = 0;
 
             while (!allRecordsReceived)
             {
@@ -93,6 +93,26 @@ namespace Geotab.CustomerOnboardngStarterKit.Utilities
                 }
             }
             return allCurrentDeviceDatabases;
-        }    
-    }
+        }
+
+		/// <summary>
+		/// Retrieves the list of MyGeotab databases (<see cref="ApiDeviceDatabaseOwnerShared"/> objects), if available, associated with the device serial number. 
+		/// </summary>
+		/// <param name="myAdminApi">A reference to a MyAdmin API (<see cref="MyAdminInvoker"/>) object.</param>
+		/// <param name="myAdminApiUser">A reference to an authenticated MyAdmin <see cref="ApiUser"/> object.</param>
+		/// <param name="serialNumbers">A list of device serial numbers for which to retrieve the list of associated owner/shared databases.</param>
+		/// <returns></returns>
+		public static async Task<IList<ApiDeviceDatabaseOwnerShared>> GetDeviceDatabaseNamesAsync(MyAdminInvoker myAdminApi, ApiUser myAdminApiUser, IList<string> serialNumbers)
+		{
+			Dictionary<string, object> parametersNew = new()
+			{
+				{"apiKey", myAdminApiUser.UserId},
+				{"sessionId", myAdminApiUser.SessionId},
+				{"serialNumbers", serialNumbers},
+			};
+
+			var currentDeviceDatabaseNames = await myAdminApi.InvokeAsync<IList<ApiDeviceDatabaseOwnerShared>> ("GetDeviceDatabaseNamesAsync", parametersNew);
+            return currentDeviceDatabaseNames;
+		}
+	}
 }
